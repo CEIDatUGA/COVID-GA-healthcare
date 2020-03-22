@@ -8,7 +8,7 @@ output:
   pdf_document: default
   html_document:
     df_print: paged
-bibliography: ["refs.bib"]
+bibliography: ["COVID-GA.bib"]
 ---
 
 ```{r setup, include=FALSE}
@@ -51,3 +51,29 @@ Na = Ntot - Nc - Ne #everyone between 18 and 65
 ```
 
 
+### Fraction hospitalized
+* [@wu2020] report that around 19% of infected require hospitalization.
+
+
+### Fraction ICU
+* [@remuzzi2020] report that 10% of infected (and diagnosed) are in ICU in Italy.
+* [@wu2020] report that around 5% of infected require critical care.
+
+
+### Length of hospital stay
+* [@guan2020] report 12 days duration of hospitalization for China.
+* [@tindale2020] report 13.3 days
+* [@sanche2020] find 11.5 days to discharge, 11.2 to death for China.
+
+
+### Fraction deaths among hospitalized
+* [@wu2020a] estimate that 14% hospitalized die.
+
+
+## Comments
+
+* See [@li2020] for a similar analysis
+* See also propublica: https://projects.propublica.org/graphics/covid-hospitals
+
+
+## References
