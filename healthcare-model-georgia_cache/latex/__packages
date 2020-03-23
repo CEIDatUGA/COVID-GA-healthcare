@@ -1,1 +1,6 @@
 base
+purrr
+knitr
+dplyr
+flextable
+xtable
