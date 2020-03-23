@@ -270,7 +270,7 @@ makefigure <- function(scenario, data)
    plotdat <- plotdat %>% mutate(Type = as.factor(stringr::str_sub(plotdat$Setting,1,4)) )  
    pl <- plotdat %>% ggplot(aes(x=Dates,y=Numbers, color = Setting))  + geom_line() + facet_wrap(~Type,ncol = 1) +
          theme_bw() 
-   pl <- ggplotly(pl)
+   #pl <- ggplotly(pl)
    return(pl)
 }
 ```
