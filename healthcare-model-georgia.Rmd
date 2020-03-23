@@ -12,7 +12,7 @@ bibliography: ["COVID-GA.bib"]
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache=TRUE, warning=FALSE)
+knitr::opts_chunk$set(echo = FALSE, cache=FALSE, warning=FALSE)
 today <- Sys.Date()
 library(purrr)
 library(knitr)
@@ -32,9 +32,11 @@ library(xtable)
 #scenariofile = 'https://raw.githubusercontent.com/CEIDatUGA/ncov-wuhan-stochastic-model/master/Georgia_scenarios_-_Sheet1.csv?token=ABQMQXYOBV7TFRDQXWX2YQC6PEFIU'
 simfile = "simresults.rds" 
 scenariofile <- 'Georgia scenarios - Sheet1.csv'
-sims <- readRDS(simfile)
 scenarios = read.csv(scenariofile)
-startdate = sims$startdate
+allsims <- readRDS(simfile)
+startdate = allsims$startdate
+allsims$startdate = NULL #remove so rest of code works
+sims = allsims
 ```
 
 
@@ -194,7 +196,7 @@ for (n1 in 1:length(sims)) #looping over all scenarios
 } #end loop over scenarios
 ```
 
-Tables with predictions for different infection spread scenarios.
+Tables with predictions for different infection spread scenarios. See [here](http://2019-coronavirus-tracker.com/stochastic-GA.html) for more details on each scenario.
 
 Results show predicted hospitalizations and critical care needs.
 For each variable, a low and high prediction is produced. Each variable is also reported as new cases for a given day and the total cases in that state at any given date.
@@ -212,6 +214,16 @@ ft
 ft <- flextable::autofit(flextable::flextable(tab[[3]]))
 ft
 ```
+
+
+
+### ```r scenarios$Description[[10]]```
+
+```{r table3}
+ft <- flextable::autofit(flextable::flextable(tab[[10]]))
+ft
+```
+
 
 
 ## Comments
