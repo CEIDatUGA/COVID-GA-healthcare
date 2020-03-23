@@ -13,12 +13,12 @@ bibliography: ["COVID-GA.bib"]
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=FALSE, warning=FALSE)
-today <- Sys.Date()
-library(purrr)
 library(knitr)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
 library(flextable)
-library(xtable)
 ```
 
 
@@ -59,55 +59,103 @@ Below are assumptions with high and low values for different quantities that go 
 
 ### Age structure for GA
 
-We use census data for population data (https://www.census.gov/quickfacts/GA). 
-Total population 10.6M, 23.8% individuals under 18, 13.9% above 65.
-This age stratification is used below for risk calcuations.
-
 ```{r parameters-1, include=FALSE}
 #age structure of population
 #https://www.census.gov/quickfacts/GA
 Ntot = 10617423
-Nc = 0.238*Ntot #under 18
-Ne = 0.139*Ntot #>65 old
-Na = Ntot - Nc - Ne #everyone between 18 and 65
+Nc = 2526947 #under 18 (children)
+Ne = 1017935 # (elderly)
+Nve = 784892 # (very elderly)
+Na = Ntot - Nc - Ne #everyone between 18 and 65 (adults)
 C_prop = Nc/Ntot
 A_prop = Na/Ntot
 E_prop = Ne/Ntot
+VE_prop = Nve/Ntot
 ```
 
-### Hospitalization and critical care risks
+We use the data below for population composition of GA. This age stratification is used below for risk calculations. 
 
-We assume that among those that are cases (i.e. infected and tested positive), 0.1% - 1% under 18 year old, 1% - 10% 18-64 year old and 15% - 25% elderly (>65y) require hospitalization. 
-Among those hospitalized, we assume 1% - 10% under 18 year old, 5% - 15% 18-64 year old and 25% - 50% elderly (>65y) require critical care. This is based on [@wu2020; @ferguson20; @remuzzi2020].
+* Total population: `r format(Ntot, scientific=FALSE)` 
+* Under 18y: `r format(Nc, scientific=FALSE)`
+* Between 18-60y: `r format(Na, scientific=FALSE)`
+* Between 60-70y: `r format(Ne, scientific=FALSE)`
+* Above 70y: `r format(Nve, scientific=FALSE)`
 
 
-```{r parameters-2, include=FALSE}
-C_hosp_low = 0.001
-A_hosp_low = 0.01
-E_hosp_low = 0.15
-C_hosp_high = 0.01
-A_hosp_high = 0.1
-E_hosp_high = 0.25
+
+### Hospitalization risk
+
+```{r parameters-hosp, include=FALSE}
+#these are proportions
+C_death_low = 0.001
+C_death_high = 0.01
+A_death_low = 0.01
+A_death_high = 0.1
+E_death_low = 0.10
+E_death_high = 0.25
+VE_death_low = 0.20
+VE_death_high = 0.50
+```
+
+
+We assume that **among those that are cases (i.e. infected and tested positive)**, risk of hospitalization is as follows. This is based on [@wu2020; @ferguson20; @remuzzi2020]. The first number is a low estimate, the second number a high end estimate. All values are percent.
+
+* Under 18y: `r sprintf("%.2f%%/%.2f%%",C_death_low*100, C_death_high*100)`
+* Between 18-60y: `r sprintf("%.2f%%/%.2f%%",A_death_low*100, A_death_high*100)`
+* Between 60-70y: `r sprintf("%.2f%%/%.2f%%",E_death_low*100, E_death_high*100)`
+* Above 70y: `r sprintf("%.2f%%/%.2f%%",VE_death_low*100, VE_death_high*100)`
+
+
+
+### Critical Care Risk 
+
+```{r parameters-crit, include=FALSE}
 C_crit_low = 0.01
-A_crit_low = 0.05
-E_crit_low = 0.25
 C_crit_high = 0.1
+A_crit_low = 0.05
 A_crit_high = 0.15
-E_crit_high = 0.50
+E_crit_low = 0.20
+E_crit_high = 0.40
+VE_crit_low = 0.40
+VE_crit_high = 0.70
 ```
 
 
-### Fraction deaths among hospitalized
-* [@wu2020a] estimate that 14% hospitalized die.
+We assume that **among those that are hospitalized**, risk of critical care need is as follows. This is based on [@wu2020; @ferguson20; @remuzzi2020]. The first number is a low estimate, the second number a high end estimate:
 
-CURRENTLY NOT LOOKING AT DEATHS, SHOULD WE?
+* Under 18y: `r sprintf("%.2f%%/%.2f%%",C_crit_low*100, C_crit_high*100)`
+* Between 18-60y: `r sprintf("%.2f%%/%.2f%%",A_crit_low*100, A_crit_high*100)`
+* Between 60-70y: `r sprintf("%.2f%%/%.2f%%",E_crit_low*100, E_crit_high*100)`
+* Above 70y: `r sprintf("%.2f%%/%.2f%%",VE_crit_low*100, VE_crit_high*100)`
+
+
+
+
+### Risk of death
+
+
+```{r parameters-death, include=FALSE}
+C_death_low = 0.00005
+C_death_high = 0.0001
+A_death_low = 0.001
+A_death_high = 0.01
+E_death_low = 0.02
+E_death_high = 0.08
+VE_death_low = 0.05
+VE_death_high = 0.20
+```
+
+
+We assume that **among cases**, risk of death is as follows. This is based on [@verity2020]. The first number is a low estimate, the second number a high end estimate:
+
+* Under 18y: `r sprintf("%.2f%%/%.2f%%",C_death_low*100, C_death_high*100)`
+* Between 18-60y: `r sprintf("%.2f%%/%.2f%%",A_death_low*100, A_death_high*100)`
+* Between 60-70y: `r sprintf("%.2f%%/%.2f%%",E_death_low*100, E_death_high*100)`
+* Above 70y: `r sprintf("%.2f%%/%.2f%%",VE_death_low*100, VE_death_high*100)`
+
 
 ### Length of hospital stay
-We assume that a hospital stay is between 10 - 20 days and independent of age. This is based on the following data:
-
-* [@guan2020] report 12 days duration of hospitalization for China.
-* [@tindale2020] report 13.3 days
-* [@sanche2020] find 11.5 days to discharge, 11.2 to death for China.
+We assume that a hospital stay is between 10 (low) and 20 (high) days and independent of age. This is based on [@guan2020; @tindale2020; @sanche2020].
 
 
 ```{r parameters-3, include=FALSE}
@@ -118,9 +166,6 @@ crit_time_high = 20
 ```
 
 
-
-
-## Model results
 
 ```{r computations, include=FALSE}
 
@@ -140,8 +185,8 @@ for (n1 in 1:length(sims)) #looping over all scenarios
    
    #new hospitalizations
    #assuming specific proportions of children/adults/elderly and associated risks   
-   Hosp_new_low = Cnewdaily*(C_prop*C_hosp_low + A_prop*A_hosp_low + E_prop*E_hosp_low)  
-   Hosp_new_high = Cnewdaily*(C_prop*C_hosp_high + A_prop*A_hosp_high + E_prop*E_hosp_high)
+   Hosp_new_low = Cnewdaily*(C_prop*C_death_low + A_prop*A_death_low + E_prop*E_death_low + VE_prop*VE_death_low)  
+   Hosp_new_high = Cnewdaily*(C_prop*C_death_high + A_prop*A_death_high + E_prop*E_death_high + VE_prop*VE_death_high) 
 
    #total hospitalization, is the cumulative of the last hosp_time days of new hospitalizations
    Hosp_tot_low = rep(0,length(Hosp_new_low))
@@ -154,8 +199,8 @@ for (n1 in 1:length(sims)) #looping over all scenarios
    
    #new critical cases
    #assuming specific proportions of children/adults/elderly and associated critical risks   
-   Crit_new_low = Hosp_new_low*(C_prop*C_crit_low + A_prop*A_crit_low + E_prop*E_crit_low)  
-   Crit_new_high = Hosp_new_high*(C_prop*C_crit_high + A_prop*A_crit_high + E_prop*E_crit_high)
+   Crit_new_low = Cnewdaily*(C_prop*C_death_low*C_crit_low + A_prop*A_death_low*A_crit_low + E_prop*E_death_low*E_crit_low + VE_prop*VE_death_low*VE_crit_low)  
+   Crit_new_high = Cnewdaily*(C_prop*C_death_high*C_crit_high + A_prop*A_death_high*A_crit_high + E_prop*E_death_high*E_crit_high + VE_prop*VE_death_high*VE_crit_high)
 
    #total critical, is the cumulative of the last crit_time days of new critical
    Crit_tot_low = rep(0,length(Crit_new_low))
@@ -165,10 +210,17 @@ for (n1 in 1:length(sims)) #looping over all scenarios
       Crit_tot_low[n3] = sum(Crit_new_low[max(1,n3-crit_time_low):n3])
       Crit_tot_high[n3] = sum(Crit_new_high[max(1,n3-crit_time_high):n3]) 
    }
- 
+
+   #new deaths - should be lagged
+   Dead_new_low = Cnewdaily*(C_prop*C_death_low + A_prop*A_death_low + E_prop*E_death_low + VE_prop*VE_death_low)  
+   Dead_new_high = Cnewdaily*(C_prop*C_death_high + A_prop*A_death_high + E_prop*E_death_high + VE_prop*VE_death_high) 
+   
+   #total hospitalization, is the cumulative of the last hosp_time days of new hospitalizations
+   Dead_tot_low = cumsum(Dead_new_low)
+   Dead_tot_high = cumsum(Dead_new_high)
     
    #save result for each stochastic simulations    
-   dat = round(data.frame(Hosp_new_low, Hosp_new_high, Hosp_tot_low, Hosp_tot_high, Crit_new_low, Crit_new_high, Crit_tot_low, Crit_tot_high))
+   dat = round(data.frame(Hosp_new_low, Hosp_new_high, Hosp_tot_low, Hosp_tot_high, Crit_new_low, Crit_new_high, Crit_tot_low, Crit_tot_high, Dead_new_low, Dead_new_high, Dead_tot_low, Dead_tot_high))
    
    res2[[n2]] = dat    
    
@@ -180,10 +232,12 @@ for (n1 in 1:length(sims)) #looping over all scenarios
 
 
 
-```{r tablecomputation, include=FALSE}
-#dates for all. Assume hospitalizations are 5 days delayed from case notifications, critical is same as hospital
-Dates = seq(from = startdate, to = (startdate+length(Crit_new_low)-1), "days" ) 
-tab = list()
+```{r meancomputation, include=FALSE}
+#dates for all. Assume hospitalizations are t_delay days delayed from case notifications, critical is same as hospital
+#deaths should probably be lagged further, are currently not
+t_delay = 5
+Dates = seq(from = startdate + t_delay, to = (startdate + t_delay + length(Crit_new_low)-1), "days" ) 
+dat = list()
 for (n1 in 1:length(sims)) #looping over all scenarios
 {
   x = res[[n1]] #pull out each scenario
@@ -192,35 +246,60 @@ for (n1 in 1:length(sims)) #looping over all scenarios
     if (n2 == 1){ xt = x[[n2]]} else {xt = xt + x[[n2]] }     
   }
   xt = round(xt/length(x))
-  tab[[n1]] = data.frame(Dates, xt)
+ dat[[n1]] = data.frame(Dates, xt)
 } #end loop over scenarios
 ```
 
-Tables with predictions for different infection spread scenarios. See [here](http://2019-coronavirus-tracker.com/stochastic-GA.html) for more details on each scenario.
+
+## Model results
+
+Figures and Tables with predictions for different infection spread scenarios. See [here](http://2019-coronavirus-tracker.com/stochastic-GA.html) for more details on each scenario.
 
 Results show predicted hospitalizations and critical care needs.
-For each variable, a low and high prediction is produced. Each variable is also reported as new cases for a given day and the total cases in that state at any given date.
+For each variable, a low and high prediction is produced. Each variable is also reported as new individuals entering a given state (hospitalized/critical/etc.) at any given day and the total number of individuals in that state at any given date.
 
-### ```r scenarios$Description[[1]]```
+
+### Result Figures
+
+```{r figure-fct, include = FALSE}
+#function to generate figure for a given scenario
+makefigure <- function(scenario, data)
+{
+   nowdat = data[[scenario]]
+   plotdat <-  nowdat %>% tidyr::pivot_longer(-Dates, names_to = "Setting", values_to = "Numbers" ) 
+   plotdat <- plotdat %>% mutate(Type = as.factor(stringr::str_sub(plotdat$Setting,1,4)) )  
+   pl <- plotdat %>% ggplot(aes(x=Dates,y=Numbers, color = Setting))  + geom_line() + facet_wrap(~Type,ncol = 1) +
+         theme_bw() 
+   pl <- ggplotly(pl)
+   return(pl)
+}
+```
+
+
+```{r table-fct, include = FALSE}
+#function to generate table for a given scenario
+maketable <- function(scenario, data)
+{
+   desc = scenarios$Description[[scenario]]
+   nowdat = data[[scenario]]
+   ft <- flextable::autofit(flextable::flextable(nowdat))
+   ft <- flextable::set_caption(ft, desc)
+   return(ft)   
+}
+```
+
+
+```{r figure1}
+fig <- makefigure(scenario = 9, data = dat)
+fig
+```
+
+
+
+### Result Tables
 
 ```{r table1}
-ft <- flextable::autofit(flextable::flextable(tab[[1]]))
-ft
-```
-
-### ```r scenarios$Description[[3]]```
-
-```{r table2}
-ft <- flextable::autofit(flextable::flextable(tab[[3]]))
-ft
-```
-
-
-
-### ```r scenarios$Description[[10]]```
-
-```{r table3}
-ft <- flextable::autofit(flextable::flextable(tab[[10]]))
+ft <- maketable(scenario = 9, data = dat)
 ft
 ```
 
