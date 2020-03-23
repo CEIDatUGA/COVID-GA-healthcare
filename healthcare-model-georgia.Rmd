@@ -258,9 +258,6 @@ Figures and Tables with predictions for different infection spread scenarios. Se
 Results show predicted hospitalizations and critical care needs.
 For each variable, a low and high prediction is produced. Each variable is also reported as new individuals entering a given state (hospitalized/critical/etc.) at any given day and the total number of individuals in that state at any given date.
 
-
-### Result Figures
-
 ```{r figure-fct, include = FALSE}
 #function to generate figure for a given scenario
 makefigure <- function(scenario, data)
@@ -275,31 +272,67 @@ makefigure <- function(scenario, data)
 }
 ```
 
-
 ```{r table-fct, include = FALSE}
 #function to generate table for a given scenario
 maketable <- function(scenario, data)
 {
-   desc = scenarios$Description[[scenario]]
    nowdat = data[[scenario]]
    ft <- flextable::autofit(flextable::flextable(nowdat))
-   ft <- flextable::set_caption(ft, desc)
    return(ft)   
 }
 ```
 
 
+
+```{r setscenario}
+scenario = 9
+```
+
+### Results for scenario `r scenario`
+
+**Scenario description**
+
+`r scenarios$Description[[scenario]]`.
+
+
+**Result Figure**
+
 ```{r figure1}
-fig <- makefigure(scenario = 9, data = dat)
+fig <- makefigure(scenario = scenario, data = dat)
 fig
 ```
 
-
-
-### Result Tables
+**Result Table**
 
 ```{r table1}
-ft <- maketable(scenario = 9, data = dat)
+ft <- maketable(scenario = scenario, data = dat)
+ft
+```
+
+
+```{r }
+scenario = 11
+```
+
+### Results for scenario `r scenario`
+
+
+**Scenario description**
+
+`r scenarios$Description[[scenario]]`.
+
+
+**Result Figure**
+
+```{r }
+fig <- makefigure(scenario = scenario, data = dat)
+fig
+```
+
+**Result Table**
+
+```{r }
+ft <- maketable(scenario = scenario, data = dat)
 ft
 ```
 
