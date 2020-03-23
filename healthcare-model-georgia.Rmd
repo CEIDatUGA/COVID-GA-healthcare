@@ -7,7 +7,7 @@ header-includes:
 output:
   html_document:
     df_print: paged
-  pdf_document: default
+    self_contained: true
 bibliography: ["COVID-GA.bib"]
 ---
 

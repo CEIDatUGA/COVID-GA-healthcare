@@ -1,0 +1,274 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Scenario analysis for healthcare needs for COVID-19 in Georgia},
+  pdfauthor={Andreas Handel (ahandel@uga.edu), John M. Drake (jdrake@uga.edu)},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{amsmath}
+
+\title{Scenario analysis for healthcare needs for COVID-19 in Georgia}
+\author{Andreas Handel
+(\href{mailto:ahandel@uga.edu}{\nolinkurl{ahandel@uga.edu}}), John M.
+Drake (\href{mailto:jdrake@uga.edu}{\nolinkurl{jdrake@uga.edu}})}
+\date{March 23, 2020}
+
+\begin{document}
+\maketitle
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+The following produces predictions for health care needs in GA for
+COVID-19. The basis for this is a transmission simulation model, which
+is described here:
+\url{http://2019-coronavirus-tracker.com/stochastic-GA.html}
+
+The transmission simulation model is run for different intervention
+scenarios. Output from this model is further processed here to produce
+estimates for health care needs in GA.
+
+\hypertarget{assumptions}{%
+\subsection{Assumptions}\label{assumptions}}
+
+Below are assumptions with high and low values for different quantities
+that go into the model predictions.
+
+\hypertarget{age-structure-for-ga}{%
+\subsubsection{Age structure for GA}\label{age-structure-for-ga}}
+
+We use the data below for population composition of GA. This age
+stratification is used below for risk calculations.
+
+\begin{itemize}
+\tightlist
+\item
+  Total population: 10617423
+\item
+  Under 18y: 2526947
+\item
+  Between 18-60y: 7072541
+\item
+  Between 60-70y: 1017935
+\item
+  Above 70y: 784892
+\end{itemize}
+
+\hypertarget{hospitalization-risk}{%
+\subsubsection{Hospitalization risk}\label{hospitalization-risk}}
+
+We assume that \textbf{among those that are cases (i.e.~infected and
+tested positive)}, risk of hospitalization is as follows. This is based
+on (Wu and McGoogan 2020; Ferguson and al. 2020; Remuzzi and Remuzzi
+2020). The first number is a low estimate, the second number a high end
+estimate. All values are percent.
+
+\begin{itemize}
+\tightlist
+\item
+  Under 18y: 0.10\%/1.00\%
+\item
+  Between 18-60y: 1.00\%/10.00\%
+\item
+  Between 60-70y: 10.00\%/25.00\%
+\item
+  Above 70y: 20.00\%/50.00\%
+\end{itemize}
+
+\hypertarget{critical-care-risk}{%
+\subsubsection{Critical Care Risk}\label{critical-care-risk}}
+
+We assume that \textbf{among those that are hospitalized}, risk of
+critical care need is as follows. This is based on (Wu and McGoogan
+2020; Ferguson and al. 2020; Remuzzi and Remuzzi 2020). The first number
+is a low estimate, the second number a high end estimate:
+
+\begin{itemize}
+\tightlist
+\item
+  Under 18y: 1.00\%/10.00\%
+\item
+  Between 18-60y: 5.00\%/15.00\%
+\item
+  Between 60-70y: 20.00\%/40.00\%
+\item
+  Above 70y: 40.00\%/70.00\%
+\end{itemize}
+
+\hypertarget{risk-of-death}{%
+\subsubsection{Risk of death}\label{risk-of-death}}
+
+We assume that \textbf{among cases}, risk of death is as follows. This
+is based on (Verity et al. 2020). The first number is a low estimate,
+the second number a high end estimate:
+
+\begin{itemize}
+\tightlist
+\item
+  Under 18y: 0.00\%/0.01\%
+\item
+  Between 18-60y: 0.10\%/1.00\%
+\item
+  Between 60-70y: 2.00\%/8.00\%
+\item
+  Above 70y: 5.00\%/20.00\%
+\end{itemize}
+
+\hypertarget{length-of-hospital-stay}{%
+\subsubsection{Length of hospital stay}\label{length-of-hospital-stay}}
+
+We assume that a hospital stay is between 10 (low) and 20 (high) days
+and independent of age. This is based on (Guan et al. 2020; Tindale et
+al. 2020; Sanche et al. 2020).
+
+\hypertarget{model-results}{%
+\subsection{Model results}\label{model-results}}
+
+Figures and Tables with predictions for different infection spread
+scenarios. See
+\href{http://2019-coronavirus-tracker.com/stochastic-GA.html}{here} for
+more details on each scenario.
+
+Results show predicted hospitalizations and critical care needs. For
+each variable, a low and high prediction is produced. Each variable is
+also reported as new individuals entering a given state
+(hospitalized/critical/etc.) at any given day and the total number of
+individuals in that state at any given date.
+
+\hypertarget{result-figures}{%
+\subsubsection{Result Figures}\label{result-figures}}
+
+\includegraphics{healthcare-model-georgia_files/figure-latex/figure1-1.pdf}
+
+\hypertarget{result-tables}{%
+\subsubsection{Result Tables}\label{result-tables}}
+
+\begin{verbatim}
+## PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
+\end{verbatim}
+
+\includegraphics[width=16.18in,height=14.89in,keepaspectratio]{healthcare-model-georgia_files/figure-latex/table1-1.png}
+
+\hypertarget{comments}{%
+\subsection{Comments}\label{comments}}
+
+\begin{itemize}
+\tightlist
+\item
+  See (Li et al. 2020) for a similar analysis
+\item
+  See also propublica:
+  \url{https://projects.propublica.org/graphics/covid-hospitals}
+\end{itemize}
+
+\hypertarget{references}{%
+\subsection*{References}\label{references}}
+\addcontentsline{toc}{subsection}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-ferguson20}{}%
+Ferguson, Neil, and et al. 2020. ``Report 9: Impact of
+Non-Pharmaceutical Interventions (Npis) to Reduce Covid-19 Mortality and
+Healthcare Demand.''
+\url{https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/news--wuhan-coronavirus/}.
+
+\leavevmode\hypertarget{ref-guan2020}{}%
+Guan, Wei-jie, Zheng-yi Ni, Yu Hu, Wen-hua Liang, Chun-quan Ou,
+Jian-xing He, Lei Liu, et al. 2020. ``Clinical Characteristics of
+Coronavirus Disease 2019 in China.'' \emph{New England Journal of
+Medicine} 0 (0): null. \url{https://doi.org/10.1056/NEJMoa2002032}.
+
+\leavevmode\hypertarget{ref-li2020}{}%
+Li, Ruoran, Caitlin Rivers, Qi Tan, Megan B. Murray, Eric Toner, and
+Marc Lipsitch. 2020. ``The Demand for Inpatient and ICU Beds for
+COVID-19 in the US: Lessons from Chinese Cities.'' \emph{medRxiv},
+March, 2020.03.09.20033241.
+\url{https://doi.org/10.1101/2020.03.09.20033241}.
+
+\leavevmode\hypertarget{ref-remuzzi2020}{}%
+Remuzzi, Andrea, and Giuseppe Remuzzi. 2020. ``COVID-19 and Italy: What
+Next?'' \emph{The Lancet} 0 (0).
+\url{https://doi.org/10.1016/S0140-6736(20)30627-9}.
+
+\leavevmode\hypertarget{ref-sanche2020}{}%
+Sanche, Steven, Yen Ting Lin, Chonggang Xu, Ethan Romero-Severson, Nick
+Hengartner, and Ruian Ke. 2020. ``The Novel Coronavirus, 2019-nCoV, Is
+Highly Contagious and More Infectious Than Initially Estimated.''
+\emph{medRxiv}, February, 2020.02.07.20021154.
+\url{https://doi.org/10.1101/2020.02.07.20021154}.
+
+\leavevmode\hypertarget{ref-tindale2020}{}%
+Tindale, Lauren, Michelle Coombe, Jessica E. Stockdale, Emma Garlock,
+Wing Yin Venus Lau, Manu Saraswat, Yen-Hsiang Brian Lee, et al. 2020.
+``Transmission Interval Estimates Suggest Pre-Symptomatic Spread of
+COVID-19.'' \emph{medRxiv}, March, 2020.03.03.20029983.
+\url{https://doi.org/10.1101/2020.03.03.20029983}.
+
+\leavevmode\hypertarget{ref-verity2020}{}%
+Verity, Robert, Lucy C. Okell, Ilaria Dorigatti, Peter Winskill, Charles
+Whittaker, Natsuko Imai, Gina Cuomo-Dannenburg, et al. 2020. ``Estimates
+of the Severity of COVID-19 Disease.'' \emph{medRxiv}, March,
+2020.03.09.20033357. \url{https://doi.org/10.1101/2020.03.09.20033357}.
+
+\leavevmode\hypertarget{ref-wu2020}{}%
+Wu, Zunyou, and Jennifer M. McGoogan. 2020. ``Characteristics of and
+Important Lessons from the Coronavirus Disease 2019 (COVID-19) Outbreak
+in China: Summary of a Report of 72 314 Cases from the Chinese Center
+for Disease Control and Prevention.'' \emph{JAMA}, February.
+\url{https://doi.org/10.1001/jama.2020.2648}.
+
+\end{document}
