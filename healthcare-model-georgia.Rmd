@@ -267,9 +267,14 @@ makefigure <- function(scenario, data)
 {
    nowdat = data[[scenario]]
    plotdat <-  nowdat %>% tidyr::pivot_longer(-Dates, names_to = "Setting", values_to = "Numbers" ) 
-   plotdat <- plotdat %>% mutate(Type = as.factor(stringr::str_sub(plotdat$Setting,1,4)) )  
-   pl <- plotdat %>% ggplot(aes(x=Dates,y=Numbers, color = Setting))  + geom_line() + facet_wrap(~Type,ncol = 1) +
-         theme_bw() 
+   plotdat <- plotdat %>% mutate(Type = factor(stringr::str_sub(plotdat$Setting,1,8),  levels = c("Hosp_new","Hosp_tot","Crit_new","Crit_tot","Dead_new","Dead_tot") ) )  
+   plotdat <- plotdat %>% mutate(H_or_L = as.factor(stringr::str_sub(plotdat$Setting,10)) )  
+   pl <- plotdat %>% ggplot()  + 
+                     geom_line(aes(x=Dates,y=Numbers,color=H_or_L)) + 
+                     facet_wrap(~Type,ncol = 2, scales = "free") +
+                     theme(legend.position = "none") +
+                     theme_bw() 
+   plot(pl)
    #pl <- ggplotly(pl)
    return(pl)
 }
@@ -305,14 +310,6 @@ fig <- makefigure(scenario = scenario, data = dat)
 fig
 ```
 
-**Result Table**
-
-```{r table1}
-ft <- maketable(scenario = scenario, data = dat)
-ft
-```
-
-
 ```{r }
 scenario = 11
 ```
@@ -332,11 +329,11 @@ fig <- makefigure(scenario = scenario, data = dat)
 fig
 ```
 
-**Result Table**
 
-```{r }
-ft <- maketable(scenario = scenario, data = dat)
-ft
+```{r, include = FALSE }
+#**Result Table**
+#ft <- maketable(scenario = scenario, data = dat)
+#ft
 ```
 
 
