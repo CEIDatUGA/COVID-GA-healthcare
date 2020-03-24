@@ -29,9 +29,10 @@ library(flextable)
 # data is a list of lists
 # main list contains a sub-list for each scenario
 # each sub-list contains n data frames, each data frame is the time-series for a simulation
-#scenariofile = 'https://raw.githubusercontent.com/CEIDatUGA/ncov-wuhan-stochastic-model/master/Georgia_scenarios_-_Sheet1.csv?token=ABQMQXYOBV7TFRDQXWX2YQC6PEFIU'
-simfile = "simresults.rds" 
-scenariofile <- 'Georgia scenarios - Sheet1.csv'
+scenariofile = 'https://raw.githubusercontent.com/CEIDatUGA/ncov-wuhan-stochastic-model/master/Georgia%20scenarios%20-%20Sheet1.csv?token=AA6F3ZKMORB6XSHDU4AFT4S6QM7LC'
+#scenariofile <- 'Georgia scenarios - Sheet1.csv'
+#simfile = "https://github.com/CEIDatUGA/ncov-wuhan-stochastic-model/blob/master/simresults.rds?token=AA6F3ZKMORB6XSHDU4AFT4S6QM7LC" 
+simfile = "simresults.rds" #for some reason, pulling this file right out of the Github repo doesn't work
 scenarios = read.csv(scenariofile)
 allsims <- readRDS(simfile)
 startdate = allsims$startdate
