@@ -274,7 +274,6 @@ makefigure <- function(scenario, data)
                      facet_wrap(~Type,ncol = 2, scales = "free") +
                      theme(legend.position = "none") +
                      theme_bw() 
-   plot(pl)
    #pl <- ggplotly(pl)
    return(pl)
 }
@@ -338,10 +337,10 @@ fig
 
 
 
-## Comments
+<!-- ## Comments -->
 
-* See [@li2020] for a similar analysis
-* See also propublica: https://projects.propublica.org/graphics/covid-hospitals
+<!-- * See [@li2020] for a similar analysis -->
+<!-- * See also propublica: https://projects.propublica.org/graphics/covid-hospitals -->
 
 
 ## References
