@@ -248,6 +248,8 @@ for (n1 in 1:length(sims)) #looping over all scenarios
   xt = round(xt/length(x))
  dat[[n1]] = data.frame(Dates, xt)
 } #end loop over scenarios
+#write computed results to file
+saveRDS(dat,'healthcareresults.rds')
 ```
 
 
