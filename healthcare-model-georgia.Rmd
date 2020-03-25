@@ -29,8 +29,8 @@ library(flextable)
 # data is a list of lists
 # main list contains a sub-list for each scenario
 # each sub-list contains n data frames, each data frame is the time-series for a simulation
-scenariofile = 'https://raw.githubusercontent.com/CEIDatUGA/ncov-wuhan-stochastic-model/master/Georgia%20scenarios%20-%20Sheet1.csv?token=AA6F3ZKMORB6XSHDU4AFT4S6QM7LC'
-#scenariofile <- 'Georgia scenarios - Sheet1.csv'
+#scenariofile = 'https://raw.githubusercontent.com/CEIDatUGA/ncov-wuhan-stochastic-model/master/Georgia%20scenarios%20-%20Sheet1.csv?token=AA6F3ZKMORB6XSHDU4AFT4S6QM7LC'
+scenariofile <- 'Georgia scenarios - Sheet1.csv'
 #simfile = "https://github.com/CEIDatUGA/ncov-wuhan-stochastic-model/blob/master/simresults.rds?token=AA6F3ZKMORB6XSHDU4AFT4S6QM7LC" 
 simfile = "simresults.rds" #for some reason, pulling this file right out of the Github repo doesn't work
 scenarios = read.csv(scenariofile)
@@ -88,23 +88,23 @@ We use the data below for population composition of GA. This age stratification 
 
 ```{r parameters-hosp, include=FALSE}
 #these are proportions
-C_death_low = 0.001
-C_death_high = 0.01
-A_death_low = 0.01
-A_death_high = 0.1
-E_death_low = 0.10
-E_death_high = 0.25
-VE_death_low = 0.20
-VE_death_high = 0.50
+C_hosp_low = 0.001
+C_hosp_high = 0.01
+A_hosp_low = 0.01
+A_hosp_high = 0.1
+E_hosp_low = 0.10
+E_hosp_high = 0.25
+VE_hosp_low = 0.20
+VE_hosp_high = 0.50
 ```
 
 
 We assume that **among those that are cases (i.e. infected and tested positive)**, risk of hospitalization is as follows. This is based on [@wu2020; @ferguson20; @remuzzi2020]. The first number is a low estimate, the second number a high end estimate. All values are percent.
 
-* Under 18y: `r sprintf("%.2f%%/%.2f%%",C_death_low*100, C_death_high*100)`
-* Between 18-60y: `r sprintf("%.2f%%/%.2f%%",A_death_low*100, A_death_high*100)`
-* Between 60-70y: `r sprintf("%.2f%%/%.2f%%",E_death_low*100, E_death_high*100)`
-* Above 70y: `r sprintf("%.2f%%/%.2f%%",VE_death_low*100, VE_death_high*100)`
+* Under 18y: `r sprintf("%.2f%%/%.2f%%",C_hosp_low*100, C_hosp_high*100)`
+* Between 18-60y: `r sprintf("%.2f%%/%.2f%%",A_hosp_low*100, A_hosp_high*100)`
+* Between 60-70y: `r sprintf("%.2f%%/%.2f%%",E_hosp_low*100, E_hosp_high*100)`
+* Above 70y: `r sprintf("%.2f%%/%.2f%%",VE_hosp_low*100, VE_hosp_high*100)`
 
 
 
@@ -149,7 +149,7 @@ VE_death_high = 0.20
 
 We assume that **among cases**, risk of death is as follows. This is based on [@verity2020]. The first number is a low estimate, the second number a high end estimate:
 
-* Under 18y: `r sprintf("%.2f%%/%.2f%%",C_death_low*100, C_death_high*100)`
+* Under 18y: `r sprintf("%.3f%%/%.3f%%",C_death_low*100, C_death_high*100)`
 * Between 18-60y: `r sprintf("%.2f%%/%.2f%%",A_death_low*100, A_death_high*100)`
 * Between 60-70y: `r sprintf("%.2f%%/%.2f%%",E_death_low*100, E_death_high*100)`
 * Above 70y: `r sprintf("%.2f%%/%.2f%%",VE_death_low*100, VE_death_high*100)`
@@ -166,6 +166,16 @@ crit_time_low = 10
 crit_time_high = 20
 ```
 
+
+### Lag times
+
+```{r parameters-4, include=FALSE}
+hosp_delay = 5
+death_delay = 10
+```
+
+
+The current assumption is that a case becomes hospitalized or critical `r hosp_delay` days after identification as a case. The lag from case identification to death is assumed to be `r death_delay` days. This is likely not true for the beginning of the outbreak, where cases where often identified after already being in the hospital.
 
 
 ```{r computations, include=FALSE}
@@ -186,8 +196,8 @@ for (n1 in 1:length(sims)) #looping over all scenarios
    
    #new hospitalizations
    #assuming specific proportions of children/adults/elderly and associated risks   
-   Hosp_new_low = Cnewdaily*(C_prop*C_death_low + A_prop*A_death_low + E_prop*E_death_low + VE_prop*VE_death_low)  
-   Hosp_new_high = Cnewdaily*(C_prop*C_death_high + A_prop*A_death_high + E_prop*E_death_high + VE_prop*VE_death_high) 
+   Hosp_new_low = Cnewdaily*(C_prop*C_hosp_low + A_prop*A_hosp_low + E_prop*E_hosp_low + VE_prop*VE_hosp_low)  
+   Hosp_new_high = Cnewdaily*(C_prop*C_hosp_high + A_prop*A_hosp_high + E_prop*E_hosp_high + VE_prop*VE_hosp_high) 
 
    #total hospitalization, is the cumulative of the last hosp_time days of new hospitalizations
    Hosp_tot_low = rep(0,length(Hosp_new_low))
@@ -200,8 +210,8 @@ for (n1 in 1:length(sims)) #looping over all scenarios
    
    #new critical cases
    #assuming specific proportions of children/adults/elderly and associated critical risks   
-   Crit_new_low = Cnewdaily*(C_prop*C_death_low*C_crit_low + A_prop*A_death_low*A_crit_low + E_prop*E_death_low*E_crit_low + VE_prop*VE_death_low*VE_crit_low)  
-   Crit_new_high = Cnewdaily*(C_prop*C_death_high*C_crit_high + A_prop*A_death_high*A_crit_high + E_prop*E_death_high*E_crit_high + VE_prop*VE_death_high*VE_crit_high)
+   Crit_new_low = Cnewdaily*(C_prop*C_hosp_low*C_crit_low + A_prop*A_hosp_low*A_crit_low + E_prop*E_hosp_low*E_crit_low + VE_prop*VE_hosp_low*VE_crit_low)  
+   Crit_new_high = Cnewdaily*(C_prop*C_hosp_high*C_crit_high + A_prop*A_hosp_high*A_crit_high + E_prop*E_hosp_high*E_crit_high + VE_prop*VE_hosp_high*VE_crit_high)
 
    #total critical, is the cumulative of the last crit_time days of new critical
    Crit_tot_low = rep(0,length(Crit_new_low))
@@ -221,7 +231,7 @@ for (n1 in 1:length(sims)) #looping over all scenarios
    Dead_tot_high = cumsum(Dead_new_high)
     
    #save result for each stochastic simulations    
-   dat = round(data.frame(Hosp_new_low, Hosp_new_high, Hosp_tot_low, Hosp_tot_high, Crit_new_low, Crit_new_high, Crit_tot_low, Crit_tot_high, Dead_new_low, Dead_new_high, Dead_tot_low, Dead_tot_high))
+   dat = round(data.frame(Case_new = Cnewdaily, Case_tot = Ctotdaily[-1], Hosp_new_low, Hosp_new_high, Hosp_tot_low, Hosp_tot_high, Crit_new_low, Crit_new_high, Crit_tot_low, Crit_tot_high, Dead_new_low, Dead_new_high, Dead_tot_low, Dead_tot_high))
    
    res2[[n2]] = dat    
    
@@ -236,8 +246,7 @@ for (n1 in 1:length(sims)) #looping over all scenarios
 ```{r meancomputation, include=FALSE}
 #dates for all. Assume hospitalizations are t_delay days delayed from case notifications, critical is same as hospital
 #deaths should probably be lagged further, are currently not
-t_delay = 5
-Dates = seq(from = startdate + t_delay, to = (startdate + t_delay + length(Crit_new_low)-1), "days" ) 
+Dates = seq(from = startdate, to = (startdate + length(Crit_new_low)-1) + 14, "days" ) 
 dat = list()
 for (n1 in 1:length(sims)) #looping over all scenarios
 {
@@ -247,33 +256,47 @@ for (n1 in 1:length(sims)) #looping over all scenarios
     if (n2 == 1){ xt = x[[n2]]} else {xt = xt + x[[n2]] }     
   }
   xt = round(xt/length(x))
- dat[[n1]] = data.frame(Dates, xt)
+  #run over each outcome column in xt, add to data frame time-shifted to account for delays
+  df = array(0, dim=c(length(Dates), ncol(xt) )) #empty data frame
+  for (n2 in 1:ncol(xt))
+  {
+     if (n2<3) #cases, no time lag
+        { 
+          df[1:nrow(xt),n2] = xt[,n2]
+        }
+     if (n2>2 && n2 <11) #hosp and crit, 7 day time lag
+        { 
+          df[(1+hosp_delay):(nrow(xt)+hosp_delay),n2] = xt[,n2]
+        }
+     if (n2>10 ) #death, 14 day time lag
+        { 
+          df[(1+death_delay):(nrow(xt)+death_delay),n2] = xt[,n2]
+        }
+  }
+  colnames(df) = colnames(xt)
+  
+  dat[[n1]] = data.frame(Dates, df)
+ 
 } #end loop over scenarios
 #write computed results to file
 saveRDS(dat,'healthcareresults.rds')
 ```
 
 
-## Model results
 
-Figures and Tables with predictions for different infection spread scenarios. See [here](http://2019-coronavirus-tracker.com/stochastic-GA.html) for more details on each scenario.
-
-Results show predicted hospitalizations and critical care needs.
-For each variable, a low and high prediction is produced. Each variable is also reported as new individuals entering a given state (hospitalized/critical/etc.) at any given day and the total number of individuals in that state at any given date.
 
 ```{r figure-fct, include = FALSE}
 #function to generate figure for a given scenario
-makefigure <- function(scenario, data)
+makefigure <- function(dat)
 {
-   nowdat = data[[scenario]]
-   plotdat <-  nowdat %>% tidyr::pivot_longer(-Dates, names_to = "Setting", values_to = "Numbers" ) 
-   plotdat <- plotdat %>% mutate(Type = factor(stringr::str_sub(plotdat$Setting,1,8),  levels = c("Hosp_new","Hosp_tot","Crit_new","Crit_tot","Dead_new","Dead_tot") ) )  
+   plotdat <- dat %>% tidyr::pivot_longer(-Dates, names_to = "Setting", values_to = "Numbers" ) 
+   plotdat <- plotdat %>% mutate(Type = factor(stringr::str_sub(plotdat$Setting,1,8),  levels = c("Case_new","Case_tot","Hosp_new","Hosp_tot","Crit_new","Crit_tot","Dead_new","Dead_tot") ) )  
    plotdat <- plotdat %>% mutate(H_or_L = as.factor(stringr::str_sub(plotdat$Setting,10)) )  
    pl <- plotdat %>% ggplot()  + 
                      geom_line(aes(x=Dates,y=Numbers,color=H_or_L)) + 
                      facet_wrap(~Type,ncol = 2, scales = "free") +
-                     theme(legend.position = "none") +
-                     theme_bw() 
+                     theme_bw() +
+                     theme(legend.position = "none") 
    #pl <- ggplotly(pl)
    return(pl)
 }
@@ -281,14 +304,21 @@ makefigure <- function(scenario, data)
 
 ```{r table-fct, include = FALSE}
 #function to generate table for a given scenario
-maketable <- function(scenario, data)
+maketable <- function(dat)
 {
-   nowdat = data[[scenario]]
-   ft <- flextable::autofit(flextable::flextable(nowdat))
+   ft <- flextable::autofit(flextable::flextable(dat))
    return(ft)   
 }
 ```
 
+
+## Model results
+
+Figures and Tables with predictions for different infection spread scenarios. See [here](http://2019-coronavirus-tracker.com/stochastic-GA.html) for more details on each scenario.
+
+Results show predicted hospitalizations and critical care needs. For each variable, a low and high prediction is produced. Each variable is reported both as new individuals entering a given state (hospitalized/critical/etc.) at any given day and the total number of individuals in that state at any given date. The total hospital and critical care capacity needs for a given day take into account both new individuals entering and those leaving (due to recovery or death).
+
+Hospitalizations and critical care numbers are assumed to lag case ascertainment by `r hosp_delay` days. Death is assumed to lag by `r death_delay` days. This is likely not true during the first few weeks, when a lot of diagnoses were only made after someone had already been in the hospital, or had died. Thus, for most of March, hospitalizations and deaths on a given day might be under-predicted. We assume that going forward, as test capacity keeps increasing, most individuals will be diagnosed before hospitalization or death.
 
 
 ```{r setscenario}
@@ -301,38 +331,39 @@ scenario = 9
 
 `r scenarios$Description[[scenario]]`.
 
+This is what we currently assume to be the most likely scenario.
 
 **Result Figure**
+
+The left column show daily new individuals. The right column shows total numbers at a given date. Note that recovery of cases is not included here, thus cases keep increasing. Cases are the average predicted from the stochastic simulation model.
+
 
 ```{r figure1}
-fig <- makefigure(scenario = scenario, data = dat)
+fig <- makefigure(dat[[scenario]])
 fig
 ```
 
-```{r }
-scenario = 11
+**Result Table**
+
+Same results as shown in the figures, but in table form.
+
+Predicted cases and deaths:
+
+```{r, include = TRUE }
+nowdat = dat[[scenario]]
+#table for cases and deaths
+ft1 <- maketable(nowdat[,c(1:3,12:15)])
+ft1
 ```
 
-### Results for scenario `r scenario`
+Predicted hospitalizations and critical care needs:
 
 
-**Scenario description**
-
-`r scenarios$Description[[scenario]]`.
-
-
-**Result Figure**
-
-```{r }
-fig <- makefigure(scenario = scenario, data = dat)
-fig
-```
-
-
-```{r, include = FALSE }
-#**Result Table**
-#ft <- maketable(scenario = scenario, data = dat)
-#ft
+```{r, include = TRUE }
+nowdat = dat[[scenario]]
+#table for hosp and critical
+ft2 <- maketable(nowdat[,c(1,4:11)])
+ft2
 ```
 
 
