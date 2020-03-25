@@ -246,7 +246,7 @@ for (n1 in 1:length(sims)) #looping over all scenarios
 ```{r meancomputation, include=FALSE}
 #dates for all. Assume hospitalizations are t_delay days delayed from case notifications, critical is same as hospital
 #deaths should probably be lagged further, are currently not
-Dates = seq(from = startdate, to = (startdate + length(Crit_new_low)-1) + 14, "days" ) 
+Dates = seq(from = startdate, to = (startdate + length(Crit_new_low)-1) + death_delay, "days" ) 
 dat = list()
 for (n1 in 1:length(sims)) #looping over all scenarios
 {
@@ -318,7 +318,8 @@ Figures and Tables with predictions for different infection spread scenarios. Se
 
 Results show predicted hospitalizations and critical care needs. For each variable, a low and high prediction is produced. Each variable is reported both as new individuals entering a given state (hospitalized/critical/etc.) at any given day and the total number of individuals in that state at any given date. The total hospital and critical care capacity needs for a given day take into account both new individuals entering and those leaving (due to recovery or death).
 
-Hospitalizations and critical care numbers are assumed to lag case ascertainment by `r hosp_delay` days. Death is assumed to lag by `r death_delay` days. This is likely not true during the first few weeks, when a lot of diagnoses were only made after someone had already been in the hospital, or had died. Thus, for most of March, hospitalizations and deaths on a given day might be under-predicted. We assume that going forward, as test capacity keeps increasing, most individuals will be diagnosed before hospitalization or death.
+The transmission simulation is run from `r startdate` to `r startdate + length(Crit_new_low)-1`, this is the reporting time-frame for cases. Hospitalizations and critical care numbers are assumed to lag case ascertainment by `r hosp_delay` days. Death is assumed to lag by `r death_delay` days. This is likely not true during the first few weeks, when a lot of diagnoses were only made after someone had already been in the hospital, or had died. Thus, for most of March, hospitalizations and deaths on a given day might be under-predicted. We assume that going forward, as test capacity keeps increasing, most individuals will be diagnosed before hospitalization or death.
+
 
 
 ```{r setscenario}
